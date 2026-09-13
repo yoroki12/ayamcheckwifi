@@ -1,12 +1,19 @@
 from scapy.all import ARP, Ether, srp
 from datetime import datetime
 import json
+import os
 
 NETWORK = input("ip= ")
 INTERFACE = "wlan0"
 
-with open("devices.json", "r") as file:
-    devices = json.load(file)
+if os.path.exists("devices.json"):
+    with open("devices.json", "r") as file:
+        devices = json.load(file)
+else:
+    devices = {"devices": {}}
+
+    with open("devices.json", "w") as file:
+        json.dump(devices, file, indent=4)
 
 known_devices = devices["devices"]
 
@@ -30,7 +37,7 @@ for _, response in answered:
     ip = response.psrc
 
     if mac not in known_devices:
-        first_seen =datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        first_seen = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         known_devices[mac] = {
             "ip": ip,
             "first_seen": first_seen
